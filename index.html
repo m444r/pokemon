@@ -1,5 +1,5 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKonrzpUnxhZ_e9F5Zvkdx4EW47zrveTk&callback=initMap" async defer></script>
-
+<button onclick="shareGame()">Share with Friends</button>
 
 <html lang="en">
 <head>
@@ -14,7 +14,7 @@
         }
     </style>
 </head>
-
+<button onclick="getLocation()">Get My Location</button>
 <body>
     <h2>Find the Hidden Object!</h2>
     <div id="map"></div>
@@ -27,7 +27,25 @@
         let showFigureMarker;
         let foundFigure = false;
         let figureLocation = null;        //38.272955 ,21.764551 
-        const targetLocation = { lat: 38.251591, lng: 21.741044 }; // Example location //spiti: 38.251591,21.741044
+        const targetLocation = { lat: 38.272955, lng: 21.764551 }; // Example location //spiti: 38.251591,21.741044
+        
+        function shareGame() {
+        const gameUrl = "https://m444r.github.io/pokemon/"; // Replace with your real link
+        navigator.clipboard.writeText(gameUrl).then(() => {
+        alert("Game link copied! Share it with your friends.");
+        }).catch(err => {
+        console.error("Failed to copy: ", err);
+        });
+        }
+
+        function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(updateUserLocation, showError, { enableHighAccuracy: true });
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+}
+
 
         function initMap() {
             map = new google.maps.Map(document.getElementById("map"), {
