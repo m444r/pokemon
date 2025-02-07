@@ -1,6 +1,6 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKonrzpUnxhZ_e9F5Zvkdx4EW47zrveTk&callback=initMap" async defer></script>
 <button onclick="shareGame()">Share with Friends</button>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -18,17 +18,20 @@
 <body>
     <h2>Find the Hidden Object!</h2>
     <div id="map"></div>
-    <button id="showFigureBtn" onclick="showFigure()" disabled>Show Figure</button>
+    <button id="showFigureBtn" onclick="showFigure()" disabled>Show Discovered Figures</button>
+
 
     <script>
         let map;
         let userMarker;
-        let figureMarker; 
-        let showFigureMarker;
+        let figureMarker = null; 
+        //let showFigureMarker;
         let foundFigure = false;
-        let figureLocation = null;        //38.272955 ,21.764551 //spiti mastorakou 38.432072, 22.870421 //elena 38.260420, 21.747962
-        const targetLocation = { lat: 38,2606549, lng: 21,7412413 }; // Example location //spiti: 38.251591,21.741044
-        
+        let showFigureMarker = null; // Store the marker globally
+        let figureLocation ;        //38.272955 ,21.764551 //spiti mastorakou 38.432072, 22.870421 elena: 38.260420, 21.747962
+        const targetLocation = { lat: 38.0923763, lng: 23.7224067 }; // Example location //spiti: 38.251591,21.741044
+        //tsimpoykis 38.282956, 21.770905
+
         function shareGame() {
         const gameUrl = "https://m444r.github.io/pokemon/"; // Replace with your real link
         navigator.clipboard.writeText(gameUrl).then(() => {
@@ -39,38 +42,38 @@
         }
 
         function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(updateUserLocation, showError, { enableHighAccuracy: true });
-    } else {
-        alert("Geolocation is not supported by this browser.");
-    }
-}
-
-
-        function initMap() {
-            map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 15,
-                center: targetLocation
-            });
-
-            // Place a marker for the target location
-            new google.maps.Marker({
-                position: targetLocation,
-                map: map,
-                title: "Target Location"
-            });
-
-            // Get the user's location
             if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(updateUserLocation, showError, {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-          			maximumAge: 0
-                });
+                navigator.geolocation.getCurrentPosition(updateUserLocation, showError, { enableHighAccuracy: true });
             } else {
-                alert("Geolocation is not supported by this browser.");
+            alert("Geolocation is not supported by this browser.");
             }
         }
+
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 15,
+            center: targetLocation
+        });
+
+            // Place a marker for the target location
+        new google.maps.Marker({
+            position: targetLocation,
+            map: map,
+            title: "Target Location"
+        });
+
+            // Get the user's location
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(updateUserLocation, showError, {
+            enableHighAccuracy: true,
+            timeout: 100000,
+        	maximumAge: 0
+           });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
 
         function updateUserLocation(position) {
             const userLocation = {
@@ -112,27 +115,52 @@
             foundFigure = true;
             figureLocation = location; // Save location for later
             document.getElementById("showFigureBtn").disabled = false;
-            alert("You've discovered a hidden figure!");
-            
+            //swal.fire("You've discovered a hidden figure!");
+            Swal.fire({
+            title: "🎉 You Found a Hidden Figure!",
+            html: "Awesome! Keep exploring.",
+            imageUrl: "https://cdn-icons-png.flaticon.com/128/4193/4193257.png", // Replace with your image URL
+            imageWidth: 150,
+            imageHeight: 150,
+            background: "#f0f0f0",
+            color: "#333",
+        });
 
         }
 
-        function showFigure() {
-            if (!foundFigure || !figureLocation) {
-                alert("You haven't discovered the figure yet!");
-                return;
+        
+/*
+        function showfigure(location) {
+            if (figureMarker) {
+                // If marker already exists, remove it
+                figureMarker.setMap(null);
+                figureMarker = null; // Reset the marker
+            } else {
+                // Create and show the marker
+                figureMarker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    icon: "https://cdn-icons-png.flaticon.com/128/4193/4193257.png"
+                });
             }
-
-            if (showFigureMarker) showFigureMarker.setMap(null);
-
+        }*/
+        
+        function showFigure() {
+            
+            if (showFigureMarker) {
+                showFigureMarker.setMap(null);
+                figureMarker = null;
+            } else{
             showFigureMarker = new google.maps.Marker({
                 position: figureLocation,
                 map: map,
                 icon: "https://cdn-icons-png.flaticon.com/128/4193/4193257.png"
             });
-
-            map.setCenter(figureLocation); // Move the map to the figure
         }
+
+           // map.setCenter(figureLocation); // Move the map to the figure
+        }
+        
 
 
         function getDistance(loc1, loc2) {
