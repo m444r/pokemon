@@ -25,12 +25,19 @@
         let map;
         let userMarker;
         let figureMarker = null; 
+        let figures = []; // Πίνακας με τις φιγούρες
+        let foundFigures = []; // Αποθήκευση των φιγούρων που έχουν 
         //let showFigureMarker;
         let foundFigure = false;
         let showFigureMarker = null; // Store the marker globally
         let figureLocation ;        //38.272955 ,21.764551 //spiti mastorakou 38.432072, 22.870421 elena: 38.260420, 21.747962
-        const targetLocation = { lat: 38.0923763, lng: 23.7224067 }; // Example location //spiti: 38.251591,21.741044
+        //const targetLocation = { lat: 38.0923763, lng: 23.7224067 }; // Example location //spiti: 38.251591,21.741044
         //tsimpoykis 38.282956, 21.770905
+        const targetLocation = [
+        { lat: 38.0923763, lng: 23.7224067 },
+        { lat: 38.251591, lng: 21.741044 },
+        { lat: 39.074206, lng: 21.824314 } //39.074206, 21.824314
+        ];
 
         function shareGame() {
         const gameUrl = "https://m444r.github.io/pokemon/"; // Replace with your real link
@@ -50,30 +57,7 @@
         }
 
 
-    function initMap() {
-        map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 15,
-            center: targetLocation
-        });
-
-            // Place a marker for the target location
-        new google.maps.Marker({
-            position: targetLocation,
-            map: map,
-            title: "Target Location"
-        });
-
-            // Get the user's location
-        if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(updateUserLocation, showError, {
-            enableHighAccuracy: true,
-            timeout: 100000,
-        	maximumAge: 0
-           });
-        } else {
-            alert("Geolocation is not supported by this browser.");
-        }
-    }
+    
 
         function updateUserLocation(position) {
             const userLocation = {
@@ -88,11 +72,12 @@
             userMarker = new google.maps.Marker({
                 position: userLocation,
                 map: map,
+              //  center: userLocation,
                 title: "You are here!",
                 icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" // Blue dot for user
             });
 
-            // Check distance from target
+           /* // Check distance from target
             const distance = getDistance(userLocation, targetLocation);
             console.log("Distance to target: " + distance + " meters");
 
@@ -100,7 +85,33 @@
                addFigure(targetLocation);
             } else {
                 if (figureMarker) figureMarker.setMap(null); // Remove the figure if out of range
+            }*/
+        }
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 15,
+                center: targetLocation[2]
+            });
+
+            for(var i = 0; i < 3; i++) {
+                new google.maps.Marker({
+                    position: targetLocation[i],
+                    map: map,
+                    title: "Target Location"
+                });
             }
+                // Get the user's location
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(updateUserLocation, showError, {
+                enableHighAccuracy: true,
+                timeout: 100000,
+                maximumAge: 0
+            });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+           // map.setCenter(userLocation);
         }
 
         function addFigure(location) {
